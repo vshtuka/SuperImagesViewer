@@ -27,10 +27,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initRecyclerView();
-    }
-
-    private void initRecyclerView() {
         recyclerView = findViewById(R.id.recyclerView);
         layoutManager = new GridLayoutManager(this, GRID_SPAN_COUNT,
                 GridLayoutManager.VERTICAL, false);
@@ -39,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
                 new GridLayoutManager.SpanSizeLookup() {
                     @Override
                     public int getSpanSize(int position) {
-                        return calculateGridCount(position);
+                        return (position % FULL_SCREEN_WIDTH_IMAGE_POSITION == 0 ?
+                                FULL_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT :
+                                HALF_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT);
                     }
                 });
         recyclerView.setHasFixedSize(true);
@@ -64,11 +62,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return drawables;
-    }
-
-    private int calculateGridCount(int position) {
-        return position % FULL_SCREEN_WIDTH_IMAGE_POSITION == 0 ?
-                FULL_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT :
-                HALF_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT;
     }
 }

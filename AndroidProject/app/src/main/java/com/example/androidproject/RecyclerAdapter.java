@@ -12,7 +12,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ImageV
 
     private Drawable[] drawables;
 
-    public RecyclerAdapter(Drawable[] drawables) {
+    RecyclerAdapter(Drawable[] drawables) {
         this.drawables = drawables;
     }
 
