@@ -16,7 +16,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ImageV
         this.drawables = drawables;
     }
 
-    static class ImageViewHolder extends RecyclerView.ViewHolder {
+    protected static class ImageViewHolder extends RecyclerView.ViewHolder {
 
         ImageView photo;
 
@@ -29,9 +29,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ImageV
     @Override
     public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_layout, parent, false);
-        ImageViewHolder imageViewHolder = new ImageViewHolder(view);
 
-        return imageViewHolder;
+        return new ImageViewHolder(view);
     }
 
     @Override

@@ -13,6 +13,12 @@ import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int GRID_SPAN_COUNT = 2;
+    private static final int FULL_SCREEN_WIDTH_IMAGE_POSITION = 5;
+    private static final int FULL_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT = 2;
+    private static final int HALF_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT = 1;
+    private static final String IMAGES_FOLDER_NAME = "MyImages";
+
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
@@ -22,13 +28,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyclerView);
-        layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        layoutManager = new GridLayoutManager(this, GRID_SPAN_COUNT,
+                GridLayoutManager.VERTICAL, false);
 
         ((GridLayoutManager) layoutManager).setSpanSizeLookup(
                 new GridLayoutManager.SpanSizeLookup() {
                     @Override
                     public int getSpanSize(int position) {
-                        return (position % 5 == 0 ? 2 : 1);
+                        return (position % FULL_SCREEN_WIDTH_IMAGE_POSITION == 0 ?
+                                FULL_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT :
+                                HALF_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT);
                     }
                 });
         recyclerView.setHasFixedSize(true);
@@ -42,16 +51,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Drawable[] loadImagesFromAssets() throws IOException {
-        String[] fileNames = getAssets().list("MyImages");
-        assert fileNames != null;
-        Drawable[] drawables = new Drawable[fileNames.length];
-        for (int i = 0; i < fileNames.length; i++) {
-            InputStream inputStream = getAssets().open("MyImages/" + fileNames[i]);
-            Drawable drawable = Drawable.createFromStream(inputStream, null);
-            drawables[i] = drawable;
+        String[] fileNames = getAssets().list(IMAGES_FOLDER_NAME);
+        Drawable[] drawables = null;
+        if (fileNames != null) {
+            drawables = new Drawable[fileNames.length];
+            for (int i = 0; i < fileNames.length; i++) {
+                InputStream inputStream = getAssets().open(IMAGES_FOLDER_NAME + "/" + fileNames[i]);
+                drawables[i] = Drawable.createFromStream(inputStream, null);
+            }
         }
 
         return drawables;
     }
-
 }
