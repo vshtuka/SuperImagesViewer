@@ -8,13 +8,12 @@ import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ImageViewHolder> {
 
-    private Drawable[] drawables;
-
-    public RecyclerAdapter(Drawable[] drawables) {
-        this.drawables = drawables;
-    }
+    private List<Drawable> drawables = new ArrayList<>();
 
     protected static class ImageViewHolder extends RecyclerView.ViewHolder {
 
@@ -35,12 +34,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ImageV
 
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
-        holder.photo.setImageDrawable(drawables[position]);
+        holder.photo.setImageDrawable(drawables.get(position));
+    }
+
+    public void setDrawables(List<Drawable> drawables) {
+        this.drawables = drawables;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return drawables.length;
+        return drawables.size();
     }
 
 }

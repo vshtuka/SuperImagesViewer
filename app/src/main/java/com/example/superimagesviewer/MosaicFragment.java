@@ -1,7 +1,9 @@
 package com.example.superimagesviewer;
 
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 public class MosaicFragment extends Fragment {
     private static final int GRID_SPAN_COUNT = 2;
     private static final int FULL_SCREEN_WIDTH_IMAGE_POSITION = 5;
@@ -22,7 +26,7 @@ public class MosaicFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
-    private RecyclerView.Adapter adapter;
+    private RecyclerAdapter adapter;
     private MosaicViewModel mosaicViewModel;
 
     @Override
@@ -55,8 +59,12 @@ public class MosaicFragment extends Fragment {
                 });
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new RecyclerAdapter(mosaicViewModel.getMosaicsList());
-        recyclerView.setAdapter(adapter);
+        adapter = new RecyclerAdapter();
+        final Observer<List<Drawable>> mosaicObserver = mosaicList -> {
+            adapter.setDrawables(mosaicList);
+            recyclerView.setAdapter(adapter);
+        };
+        mosaicViewModel.getMosaicsList().observe(getViewLifecycleOwner(), mosaicObserver);
     }
 
     private int calculateGridCount(int position) {
