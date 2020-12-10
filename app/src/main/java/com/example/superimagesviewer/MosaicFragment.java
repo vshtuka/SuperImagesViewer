@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.IOException;
 import java.util.List;
 
 public class MosaicFragment extends Fragment {
@@ -44,10 +45,14 @@ public class MosaicFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mosaicViewModel = new ViewModelProvider(this).get(MosaicViewModel.class);
-        initRecyclerView();
+        try {
+            initRecyclerView();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void initRecyclerView() {
+    private void initRecyclerView() throws IOException {
         layoutManager = new GridLayoutManager(getContext(), GRID_SPAN_COUNT,
                 GridLayoutManager.VERTICAL, false);
         ((GridLayoutManager) layoutManager).setSpanSizeLookup(
