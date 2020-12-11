@@ -1,4 +1,4 @@
-package com.example.androidproject;
+package com.example.superimagesviewer;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.example.androidproject;
+package com.example.superimagesviewer;
 
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -8,13 +8,12 @@ import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ImageViewHolder> {
 
-    private Drawable[] drawables;
-
-    public RecyclerAdapter(Drawable[] drawables) {
-        this.drawables = drawables;
-    }
+    private List<Drawable> drawables = new ArrayList<>();
 
     protected static class ImageViewHolder extends RecyclerView.ViewHolder {
 
@@ -28,19 +27,24 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ImageV
 
     @Override
     public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.mosaic_item, parent, false);
 
         return new ImageViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
-        holder.photo.setImageDrawable(drawables[position]);
+        holder.photo.setImageDrawable(drawables.get(position));
+    }
+
+    public void setDrawables(List<Drawable> drawables) {
+        this.drawables = drawables;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return drawables.length;
+        return drawables.size();
     }
 
 }
