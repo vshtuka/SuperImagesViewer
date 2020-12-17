@@ -26,7 +26,6 @@ public class MosaicFragment extends Fragment {
     private static final int HALF_SCREEN_WIDTH_IMAGE_GRID_SPAN_COUNT = 1;
 
     private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
     private RecyclerAdapter adapter;
     private MosaicViewModel mosaicViewModel;
 
@@ -45,17 +44,13 @@ public class MosaicFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mosaicViewModel = new ViewModelProvider(this).get(MosaicViewModel.class);
-        try {
-            initRecyclerView();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        initRecyclerView();
     }
 
-    private void initRecyclerView() throws IOException {
-        layoutManager = new GridLayoutManager(getContext(), GRID_SPAN_COUNT,
+    private void initRecyclerView() {
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), GRID_SPAN_COUNT,
                 GridLayoutManager.VERTICAL, false);
-        ((GridLayoutManager) layoutManager).setSpanSizeLookup(
+        layoutManager.setSpanSizeLookup(
                 new GridLayoutManager.SpanSizeLookup() {
                     @Override
                     public int getSpanSize(int position) {
