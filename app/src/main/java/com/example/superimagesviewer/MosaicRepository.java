@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class MosaicRepository {
 
     private static final String IMAGES_FOLDER_NAME = "MyImages";
 
-    private MutableLiveData<List<Drawable>> mosaicsList = new MutableLiveData<>();
+    private final MutableLiveData<List<Drawable>> mosaicsList = new MutableLiveData<>();
     private final List<Drawable> drawables = new ArrayList<>();
 
     MosaicRepository(Application application) {
@@ -31,16 +32,16 @@ public class MosaicRepository {
 
     private class InsertAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        private final Application application;
+        private final WeakReference<Application> applicationWeakReference;
 
         public InsertAsyncTask(Application application) {
-            this.application = application;
+            applicationWeakReference = new WeakReference<>(application);
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                loadImagesFromAssets(application);
+                loadImagesFromAssets(applicationWeakReference.get());
             } catch (IOException e) {
                 e.printStackTrace();
             }
