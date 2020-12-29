@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -56,13 +55,15 @@ public class MosaicRepository {
     }
 
     private void loadImagesFromAssets(Application application) throws IOException {
-        AssetManager assets = application.getAssets();
-        String[] fileNames = assets.list(IMAGES_FOLDER_NAME);
-        if (fileNames != null) {
-            for (String fileName : fileNames) {
-                System.out.println(fileName);
-                InputStream inputStream = assets.open(IMAGES_FOLDER_NAME + "/" + fileName);
-                drawables.add(Drawable.createFromStream(inputStream, null));
+        if (application != null) {
+            AssetManager assets = application.getAssets();
+            String[] fileNames = assets.list(IMAGES_FOLDER_NAME);
+            if (fileNames != null) {
+                for (String fileName : fileNames) {
+                    System.out.println(fileName);
+                    InputStream inputStream = assets.open(IMAGES_FOLDER_NAME + "/" + fileName);
+                    drawables.add(Drawable.createFromStream(inputStream, null));
+                }
             }
         }
     }
