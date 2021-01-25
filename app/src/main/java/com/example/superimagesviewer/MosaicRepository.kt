@@ -1,48 +1,35 @@
 package com.example.superimagesviewer
 
 import android.app.Application
+import android.content.res.AssetManager
 import androidx.lifecycle.MutableLiveData
 import android.graphics.drawable.Drawable
 import androidx.lifecycle.LiveData
-import android.os.AsyncTask
-import java.io.IOException
-import java.lang.ref.WeakReference
+import kotlinx.coroutines.*
 
 class MosaicRepository(application: Application) {
-    val mosaicsList = MutableLiveData<List<Drawable>>()
+
     private val drawables = mutableListOf<Drawable>()
+    private val mosaicsList = MutableLiveData<List<Drawable>>()
+
     fun getMosaicsList(): LiveData<List<Drawable>> {
         return mosaicsList
     }
 
-    private inner class InsertAsyncTask(application: Application) : AsyncTask<Void, Void, Void>() {
-        private val applicationWeakReference: WeakReference<Application> = WeakReference(application)
-        override fun doInBackground(vararg params: Void?): Void? {
-            try {
-                loadImagesFromAssets(applicationWeakReference.get())
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            return null
-        }
-
-        override fun onPostExecute(aVoid: Void?) {
-            mosaicsList.postValue(drawables)
-        }
-
-    }
-
-    @Throws(IOException::class)
-    private fun loadImagesFromAssets(application: Application?) {
-        if (application != null) {
-            val assets = application.assets
-            val fileNames = assets.list(IMAGES_FOLDER_NAME)
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun loadImagesFromAssets(application: Application) {
+        withContext(Dispatchers.IO){
+            val assetManager: AssetManager = application.assets
+            val fileNames = assetManager.list(IMAGES_FOLDER_NAME)
             if (fileNames != null) {
                 for (fileName in fileNames) {
-                    val inputStream = assets.open("$IMAGES_FOLDER_NAME/$fileName")
+                    val inputStream = assetManager.open("$IMAGES_FOLDER_NAME/$fileName")
                     drawables.add(Drawable.createFromStream(inputStream, null))
                 }
             }
+        }
+        withContext(Dispatchers.Main) {
+            mosaicsList.postValue(drawables)
         }
     }
 
@@ -51,6 +38,8 @@ class MosaicRepository(application: Application) {
     }
 
     init {
-        InsertAsyncTask(application).execute()
+        CoroutineScope(Dispatchers.Main).launch {
+            loadImagesFromAssets(application)
+        }
     }
 }

@@ -40,14 +40,14 @@ class MosaicFragment : Fragment() {
                 return calculateGridCount(position)
             }
         }
-        recyclerView!!.setHasFixedSize(true)
-        recyclerView!!.layoutManager = layoutManager
+        recyclerView?.setHasFixedSize(true)
+        recyclerView?.layoutManager = layoutManager
         adapter = RecyclerAdapter()
         val mosaicObserver = Observer { mosaicList: List<Drawable> ->
-            adapter!!.setDrawables(mosaicList)
-            recyclerView!!.adapter = adapter
+            adapter?.setDrawables(mosaicList)
+            recyclerView?.adapter = adapter
         }
-        mosaicViewModel!!.mosaicsList.observe(viewLifecycleOwner, mosaicObserver)
+        mosaicViewModel?.mosaicsList?.observe(viewLifecycleOwner, mosaicObserver)
     }
 
     private fun calculateGridCount(position: Int): Int {
