@@ -12,6 +12,12 @@ class MosaicRepository(application: Application) {
     private val drawables = mutableListOf<Drawable>()
     private val mosaicsList = MutableLiveData<List<Drawable>>()
 
+    init {
+        CoroutineScope(Dispatchers.Main).launch {
+            loadImagesFromAssets(application)
+        }
+    }
+
     fun getMosaicsList(): LiveData<List<Drawable>> {
         return mosaicsList
     }
@@ -37,9 +43,4 @@ class MosaicRepository(application: Application) {
         private const val IMAGES_FOLDER_NAME = "MyImages"
     }
 
-    init {
-        CoroutineScope(Dispatchers.Main).launch {
-            loadImagesFromAssets(application)
-        }
-    }
 }
