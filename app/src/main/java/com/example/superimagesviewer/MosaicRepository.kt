@@ -1,46 +1,75 @@
 package com.example.superimagesviewer
 
 import android.app.Application
-import android.content.res.AssetManager
-import androidx.lifecycle.MutableLiveData
 import android.graphics.drawable.Drawable
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import coil.Coil
+import coil.request.GetRequest
+import com.facebook.*
 import kotlinx.coroutines.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MosaicRepository(application: Application) {
 
     private val drawables = mutableListOf<Drawable>()
     private val mosaicsList = MutableLiveData<List<Drawable>>()
-
-    init {
-        CoroutineScope(Dispatchers.Main).launch {
-            loadImagesFromAssets(application)
-        }
-    }
-
     fun getMosaicsList(): LiveData<List<Drawable>> {
         return mosaicsList
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun loadImagesFromAssets(application: Application) {
-        withContext(Dispatchers.IO){
-            val assetManager: AssetManager = application.assets
-            val fileNames = assetManager.list(IMAGES_FOLDER_NAME)
-            if (fileNames != null) {
-                for (fileName in fileNames) {
-                    val inputStream = assetManager.open("$IMAGES_FOLDER_NAME/$fileName")
-                    drawables.add(Drawable.createFromStream(inputStream, null))
+    init {
+        loadImagesFromInstagram(application)
+    }
+
+    private fun loadImagesFromInstagram(application: Application) {
+        val token: AccessToken = AccessToken.getCurrentAccessToken()
+        GraphRequest(
+            token,
+            "/$INSTAGRAM_ID/media",
+            null,
+            HttpMethod.GET
+        ) { response ->
+            val graphResponse: JSONObject = response.jsonObject
+            val data: JSONArray = graphResponse.getJSONArray("data")
+            for (id in 0 until data.length()) {
+                val imageId: String = data.getJSONObject(id).getString("id")
+                GraphRequest(
+                    token,
+                    "/$imageId?fields=media_url",
+                    null,
+                    HttpMethod.GET
+                ) { response2 ->
+                    val graphResponse2: JSONObject = response2.jsonObject
+                    val imageUrl: String = graphResponse2.getString("media_url")
+                    loadImageByCoil(application, imageUrl)
+                }.executeAsync()
+            }
+        }.executeAsync()
+    }
+
+    private fun loadImageByCoil(application: Application, imageUrl: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                val imageLoader = Coil.imageLoader(application)
+                val request = GetRequest.Builder(application)
+                    .data(imageUrl)
+                    .build()
+                val drawable = imageLoader.execute(request).drawable
+                if (drawable != null) {
+                    drawables.add(drawable)
+                    mosaicsList.postValue(drawables)
                 }
             }
         }
-        withContext(Dispatchers.Main) {
-            mosaicsList.postValue(drawables)
-        }
+
     }
 
     companion object {
-        private const val IMAGES_FOLDER_NAME = "MyImages"
+        private const val INSTAGRAM_ID = 17841445611980036
     }
 
 }
+
+
