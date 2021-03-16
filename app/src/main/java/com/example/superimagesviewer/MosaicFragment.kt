@@ -32,7 +32,12 @@ class MosaicFragment : Fragment() {
         mosaicViewModel = ViewModelProvider(this).get(MosaicViewModel::class.java)
         initRecyclerView()
     }
-    
+
+    override fun onStop() {
+        super.onStop()
+        MosaicRepository.graphRequest.executeAsync().cancel(true)
+    }
+
     private fun initRecyclerView() {
         val layoutManager = GridLayoutManager(context, GRID_SPAN_COUNT,
                 GridLayoutManager.VERTICAL, false)
