@@ -35,7 +35,7 @@ class MosaicFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        MosaicRepository.graphRequest.executeAsync().cancel(true)
+        MosaicRepository.findImagesByIdsAsyncTask.cancel(true)
     }
 
     private fun initRecyclerView() {

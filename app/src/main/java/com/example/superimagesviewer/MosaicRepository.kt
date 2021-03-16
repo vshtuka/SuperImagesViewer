@@ -16,7 +16,6 @@ import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
 
-
 class MosaicRepository(application: Application) {
 
     val TAG = MosaicRepository::class.simpleName
@@ -37,48 +36,48 @@ class MosaicRepository(application: Application) {
     }
 
     private fun loadImagesFromInstagram(application: Application) {
-        val token: AccessToken = AccessToken.getCurrentAccessToken()
+        val token = AccessToken.getCurrentAccessToken()
         GraphRequest(
             token,
             "/$INSTAGRAM_ID/media",
             null,
             HttpMethod.GET
-        ) { response ->
-            findImagesByIds(response, application, token)
+        ) { findMediasResponse ->
+            findImagesByIds(findMediasResponse, application, token)
         }.executeAsync()
     }
 
     private fun findImagesByIds(
-        response: GraphResponse,
+        findMediasResponse: GraphResponse,
         application: Application,
         token: AccessToken
     ) {
-        val graphResponse: JSONObject = response.jsonObject
-        val data: JSONArray = graphResponse.getJSONArray("data")
+        val findDataResponse: JSONObject = findMediasResponse.jsonObject
+        val data: JSONArray = findDataResponse.getJSONArray("data")
         for (id in 0 until data.length()) {
             val imageId: String = data.getJSONObject(id).getString("id")
-            graphRequest = GraphRequest(
+            val findImagesByIdsRequest = GraphRequest(
                 token,
                 "/$imageId?fields=media_url",
                 null,
                 HttpMethod.GET
-            ) { response2 ->
-                loadImageByCoil(response2, application)
+            ) { findImageByUrlResponse ->
+                loadImageByCoil(findImageByUrlResponse, application)
             }
-            graphRequest.executeAsync()
+            findImagesByIdsAsyncTask = findImagesByIdsRequest.executeAsync()
         }
     }
 
-    private fun loadImageByCoil(response2: GraphResponse, application: Application) {
-        val graphResponse2: JSONObject = response2.jsonObject
-        val imageUrl: String = graphResponse2.getString("media_url")
+    private fun loadImageByCoil(findImageByUrlResponse: GraphResponse, application: Application) {
+        val imageUrlResponse: JSONObject = findImageByUrlResponse.jsonObject
+        val imageUrl: String = imageUrlResponse.getString("media_url")
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO) {
                 val imageLoader = Coil.imageLoader(application)
-                val request = GetRequest.Builder(application)
+                val coilRequest = GetRequest.Builder(application)
                     .data(imageUrl)
                     .build()
-                val drawable = imageLoader.execute(request).drawable
+                val drawable = imageLoader.execute(coilRequest).drawable
                 if (drawable != null) {
                     drawables.add(drawable)
                     mosaicsList.postValue(drawables)
@@ -98,10 +97,8 @@ class MosaicRepository(application: Application) {
     }
 
     companion object {
-        lateinit var graphRequest: GraphRequest
+        lateinit var findImagesByIdsAsyncTask: GraphRequestAsyncTask
         private const val INSTAGRAM_ID = 17841445611980036
     }
 
 }
-
-
