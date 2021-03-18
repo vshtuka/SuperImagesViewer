@@ -1,8 +1,8 @@
 package com.example.superimagesviewer
 
+import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.RecyclerView
 import com.example.superimagesviewer.RecyclerAdapter.ImageViewHolder
-import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +14,6 @@ class RecyclerAdapter : RecyclerView.Adapter<ImageViewHolder>() {
 
     class ImageViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var photo: ImageView = itemView.findViewById(R.id.photo)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -34,4 +33,5 @@ class RecyclerAdapter : RecyclerView.Adapter<ImageViewHolder>() {
     override fun getItemCount(): Int {
         return drawables.size
     }
+
 }

@@ -1,46 +1,104 @@
 package com.example.superimagesviewer
 
 import android.app.Application
-import android.content.res.AssetManager
-import androidx.lifecycle.MutableLiveData
+import android.content.Context
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import coil.Coil
+import coil.request.GetRequest
+import com.facebook.*
+import com.facebook.AccessToken
 import kotlinx.coroutines.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MosaicRepository(application: Application) {
 
+    val TAG = MosaicRepository::class.simpleName
+
     private val drawables = mutableListOf<Drawable>()
     private val mosaicsList = MutableLiveData<List<Drawable>>()
-
-    init {
-        CoroutineScope(Dispatchers.Main).launch {
-            loadImagesFromAssets(application)
-        }
-    }
-
     fun getMosaicsList(): LiveData<List<Drawable>> {
         return mosaicsList
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun loadImagesFromAssets(application: Application) {
-        withContext(Dispatchers.IO){
-            val assetManager: AssetManager = application.assets
-            val fileNames = assetManager.list(IMAGES_FOLDER_NAME)
-            if (fileNames != null) {
-                for (fileName in fileNames) {
-                    val inputStream = assetManager.open("$IMAGES_FOLDER_NAME/$fileName")
-                    drawables.add(Drawable.createFromStream(inputStream, null))
-                }
-            }
-        }
-        withContext(Dispatchers.Main) {
-            mosaicsList.postValue(drawables)
+    init {
+        if (isNetworkConnected(application)) {
+            Log.d(TAG, "Successful internet connection")
+            loadImagesFromInstagram(application)
+        } else {
+            Log.d(TAG, "No internet connection or network problems")
         }
     }
 
+    private fun loadImagesFromInstagram(application: Application) {
+        val token = AccessToken.getCurrentAccessToken()
+        GraphRequest(
+            token,
+            "/$INSTAGRAM_ID/media",
+            null,
+            HttpMethod.GET
+        ) { findMediasResponse ->
+            findImagesByIds(findMediasResponse, application, token)
+        }.executeAsync()
+    }
+
+    private fun findImagesByIds(
+        findMediasResponse: GraphResponse,
+        application: Application,
+        token: AccessToken
+    ) {
+        val findDataResponse: JSONObject = findMediasResponse.jsonObject
+        val data: JSONArray = findDataResponse.getJSONArray("data")
+        for (id in 0 until data.length()) {
+            val imageId: String = data.getJSONObject(id).getString("id")
+            val findImagesByIdsRequest = GraphRequest(
+                token,
+                "/$imageId?fields=media_url",
+                null,
+                HttpMethod.GET
+            ) { findImageByUrlResponse ->
+                loadImageByCoil(findImageByUrlResponse, application)
+            }
+            findImagesByIdsAsyncTask = findImagesByIdsRequest.executeAsync()
+        }
+    }
+
+    private fun loadImageByCoil(findImageByUrlResponse: GraphResponse, application: Application) {
+        val imageUrlResponse: JSONObject = findImageByUrlResponse.jsonObject
+        val imageUrl: String = imageUrlResponse.getString("media_url")
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                val imageLoader = Coil.imageLoader(application)
+                val coilRequest = GetRequest.Builder(application)
+                    .data(imageUrl)
+                    .build()
+                val drawable = imageLoader.execute(coilRequest).drawable
+                if (drawable != null) {
+                    drawables.add(drawable)
+                    mosaicsList.postValue(drawables)
+                }
+            }
+        }
+
+    }
+
+    private fun isNetworkConnected(application: Application): Boolean {
+        val connectivityManager =
+            application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+        return networkCapabilities != null &&
+                networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
     companion object {
-        private const val IMAGES_FOLDER_NAME = "MyImages"
+        lateinit var findImagesByIdsAsyncTask: GraphRequestAsyncTask
+        private const val INSTAGRAM_ID = 17841445611980036
     }
 
 }

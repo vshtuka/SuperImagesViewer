@@ -1,5 +1,6 @@
 package com.example.superimagesviewer
 
+import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,12 +8,12 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
-import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 
 class MosaicFragment : Fragment() {
+
     private var recyclerView: RecyclerView? = null
     private var adapter: RecyclerAdapter? = null
     private var mosaicViewModel: MosaicViewModel? = null
@@ -30,6 +31,11 @@ class MosaicFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         mosaicViewModel = ViewModelProvider(this).get(MosaicViewModel::class.java)
         initRecyclerView()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MosaicRepository.findImagesByIdsAsyncTask.cancel(true)
     }
 
     private fun initRecyclerView() {
