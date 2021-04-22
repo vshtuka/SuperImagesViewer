@@ -1,25 +1,27 @@
 package com.example.superimagesviewer
 
 import android.graphics.drawable.Drawable
-import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
-import android.view.View
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 
 class MosaicFragment : Fragment() {
 
-    private var recyclerView: RecyclerView? = null
-    private var adapter: RecyclerAdapter? = null
-    private var mosaicViewModel: MosaicViewModel? = null
+    lateinit var recyclerView: RecyclerView
+    lateinit var adapter: RecyclerAdapter
+    lateinit var mosaicViewModel: MosaicViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.mosaic_fragment, container, false)
     }
 
@@ -39,21 +41,23 @@ class MosaicFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        val layoutManager = GridLayoutManager(context, GRID_SPAN_COUNT,
-                GridLayoutManager.VERTICAL, false)
+        val layoutManager = GridLayoutManager(
+            context, GRID_SPAN_COUNT,
+            GridLayoutManager.VERTICAL, false
+        )
         layoutManager.spanSizeLookup = object : SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return calculateGridCount(position)
             }
         }
-        recyclerView?.setHasFixedSize(true)
-        recyclerView?.layoutManager = layoutManager
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = layoutManager
         adapter = RecyclerAdapter()
         val mosaicObserver = Observer { mosaicList: List<Drawable> ->
-            adapter?.setDrawables(mosaicList)
-            recyclerView?.adapter = adapter
+            adapter.setDrawables(mosaicList)
+            recyclerView.adapter = adapter
         }
-        mosaicViewModel?.mosaicsList?.observe(viewLifecycleOwner, mosaicObserver)
+        mosaicViewModel.mosaicsList.observe(viewLifecycleOwner, mosaicObserver)
     }
 
     private fun calculateGridCount(position: Int): Int {
