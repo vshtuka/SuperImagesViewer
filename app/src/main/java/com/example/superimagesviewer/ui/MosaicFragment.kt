@@ -1,19 +1,27 @@
-package com.example.superimagesviewer
+package com.example.superimagesviewer.ui
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.superimagesviewer.repository.MosaicRepository
+import com.example.superimagesviewer.viewmodel.MosaicViewModel
+import com.example.superimagesviewer.R
+import com.example.superimagesviewer.RecyclerAdapter
 
 class MosaicFragment : Fragment() {
 
+    lateinit var postPageButton: Button
     lateinit var recyclerView: RecyclerView
     lateinit var adapter: RecyclerAdapter
     lateinit var mosaicViewModel: MosaicViewModel
@@ -27,6 +35,12 @@ class MosaicFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = view.findViewById(R.id.recycler_view)
+        postPageButton = view.findViewById(R.id.mosaic_to_post_page_button)
+        postPageButton.setOnClickListener{
+            view.findNavController().navigate(
+                MosaicFragmentDirections.actionMosaicFragmentToInstagramPostFragment()
+            )
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

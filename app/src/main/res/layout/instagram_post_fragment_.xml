@@ -4,33 +4,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".InstagramPostFragment">
+    tools:context=".ui.InstagramPostFragment">
+
+    <Button
+        android:id="@+id/post_to_mosaic_page_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/post_to_mosaic_page"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
     <Button
         android:id="@+id/upload_button"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="Upload"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/upload"
         android:textAllCaps="true"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_text_photo_url" />
 
     <EditText
         android:id="@+id/edit_text_photo_url"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="10dp"
-        android:backgroundTint="#FFFFFF"
-        android:hint="Please enter photo URL"
+        android:layout_height="wrap_content"
+        android:hint="@string/please_enter_photo_url"
         android:inputType="textWebEditText"
         android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
         android:textIsSelectable="false"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/upload_button"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

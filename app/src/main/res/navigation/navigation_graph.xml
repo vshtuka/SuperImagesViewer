@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/facebookLoginFragment">
+    <fragment
+        android:id="@+id/facebookLoginFragment"
+        android:name="com.example.superimagesviewer.ui.FacebookLoginFragment"
+        android:label="facebook_login_fragment"
+        tools:layout="@layout/facebook_login_fragment" >
+        <action
+            android:id="@+id/action_facebookLoginFragment_to_mosaicFragment"
+            app:destination="@id/mosaicFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mosaicFragment"
+        android:name="com.example.superimagesviewer.ui.MosaicFragment"
+        android:label="mosaic_fragment"
+        tools:layout="@layout/mosaic_fragment">
+        <action
+            android:id="@+id/action_mosaicFragment_to_instagramPostFragment"
+            app:destination="@id/instagramPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/instagramPostFragment"
+        android:name="com.example.superimagesviewer.ui.InstagramPostFragment"
+        android:label="instagram_post_fragment_"
+        tools:layout="@layout/instagram_post_fragment_" >
+        <action
+            android:id="@+id/action_instagramPostFragment_to_mosaicFragment"
+            app:destination="@id/mosaicFragment" />
+    </fragment>
+</navigation>
