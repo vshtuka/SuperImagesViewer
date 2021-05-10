@@ -1,4 +1,4 @@
-package com.example.superimagesviewer
+package com.example.superimagesviewer.repository
 
 import android.app.Application
 import android.content.Context
@@ -85,6 +85,25 @@ class MosaicRepository(application: Application) {
             }
         }
 
+    }
+
+    fun uploadPhotoToInstagramByUrl(photoUrl: String) {
+        val token = AccessToken.getCurrentAccessToken()
+        GraphRequest(
+            token,
+            "$INSTAGRAM_ID/media?image_url=$photoUrl",
+            null,
+            HttpMethod.POST
+        ) { findMediaContainerResponse ->
+            val containerIdResponse: JSONObject = findMediaContainerResponse.jsonObject
+            val containerId: String = containerIdResponse.getString("id")
+            GraphRequest(
+                token,
+                "$INSTAGRAM_ID/media_publish?creation_id=$containerId",
+                null,
+                HttpMethod.POST
+            ).executeAsync()
+        }.executeAsync()
     }
 
     private fun isNetworkConnected(application: Application): Boolean {

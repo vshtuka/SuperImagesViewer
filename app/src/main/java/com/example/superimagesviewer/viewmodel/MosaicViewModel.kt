@@ -1,9 +1,10 @@
-package com.example.superimagesviewer
+package com.example.superimagesviewer.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import android.graphics.drawable.Drawable
+import com.example.superimagesviewer.repository.MosaicRepository
 
 class MosaicViewModel(application: Application) : AndroidViewModel(application) {
     val mosaicsList: LiveData<List<Drawable>>
