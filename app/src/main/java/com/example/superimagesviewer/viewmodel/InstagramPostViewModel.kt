@@ -8,10 +8,9 @@ import com.example.superimagesviewer.repository.MosaicRepository
 
 class InstagramPostViewModel(application: Application) : AndroidViewModel(application) {
 
-    lateinit var photoUrl: String
     private val mosaicRepository: MosaicRepository = MosaicRepository(application)
 
-    fun uploadImageToInstagram(){
+    fun uploadImageToInstagram(photoUrl: String){
         mosaicRepository.uploadPhotoToInstagramByUrl(photoUrl)
     }
 }
