@@ -6,33 +6,30 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.example.superimagesviewer.R
+import com.example.superimagesviewer.databinding.FacebookLoginFragmentBinding
 import com.example.superimagesviewer.viewmodel.FacebookLoginViewModel
 import com.facebook.login.LoginManager
 
 class FacebookLoginFragment : Fragment() {
 
-    private lateinit var mosaicPageButton: Button
+    private lateinit var binding: FacebookLoginFragmentBinding
     private lateinit var facebookLoginViewModel: FacebookLoginViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.facebook_login_fragment, container, false)
+    ): View {
+        binding = DataBindingUtil.inflate(
+            inflater, R.layout.facebook_login_fragment, container, false
+        )
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        mosaicPageButton = view.findViewById(R.id.login_to_mosaic_page_button)
-        mosaicPageButton.setOnClickListener {
-            view.findNavController().navigate(
-                FacebookLoginFragmentDirections.actionFacebookLoginFragmentToMosaicFragment()
-            )
-        }
-        
         LoginManager.getInstance().logInWithReadPermissions(
             this, listOf(
                 "public_profile",
@@ -55,7 +52,7 @@ class FacebookLoginFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        facebookLoginViewModel.onResultFromActivity(requestCode,resultCode,data)
+        facebookLoginViewModel.onResultFromActivity(requestCode, resultCode, data)
     }
 
 }

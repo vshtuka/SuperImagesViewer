@@ -25,14 +25,33 @@ class MosaicRepository(application: Application) {
     fun getMosaicsList(): LiveData<List<Drawable>> {
         return mosaicsList
     }
+    private val instagramUserName = MutableLiveData<String>()
+    fun getUserName(): LiveData<String> {
+        return instagramUserName
+    }
 
     init {
         if (isNetworkConnected(application)) {
             Log.d(TAG, "Successful internet connection")
+            loadInstagramUserName()
             loadImagesFromInstagram(application)
         } else {
             Log.d(TAG, "No internet connection or network problems")
         }
+    }
+
+    private fun loadInstagramUserName() {
+        val token = AccessToken.getCurrentAccessToken()
+        GraphRequest(
+            token,
+            "/$INSTAGRAM_ID?fields=username",
+            null,
+            HttpMethod.GET
+        ) { findUserNameResponse ->
+            val userNameResponse: JSONObject = findUserNameResponse.jsonObject
+            val userName = userNameResponse.getString("username")
+            instagramUserName.postValue(userName)
+        }.executeAsync()
     }
 
     private fun loadImagesFromInstagram(application: Application) {
