@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.example.superimagesviewer.R
 import com.example.superimagesviewer.RecyclerAdapter
+import com.example.superimagesviewer.Settings
 import com.example.superimagesviewer.databinding.MosaicFragmentBinding
 import com.example.superimagesviewer.repository.MosaicRepository
 import com.example.superimagesviewer.viewmodel.MosaicViewModel
@@ -41,10 +42,8 @@ class MosaicFragment : Fragment() {
     }
 
     private fun setFragmentTitle() {
-        val userNameObserver = Observer {instagramUserName: String ->
-            (requireActivity() as AppCompatActivity).supportActionBar?.title = instagramUserName
-        }
-        mosaicViewModel.userName.observe(viewLifecycleOwner, userNameObserver)
+        (requireActivity() as AppCompatActivity).supportActionBar?.title =
+            Settings.getUserName(requireContext())
     }
 
     override fun onStop() {
