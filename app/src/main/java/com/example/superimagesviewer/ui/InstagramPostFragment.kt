@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.webkit.URLUtil
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import com.example.superimagesviewer.viewmodel.InstagramPostViewModel
 import com.example.superimagesviewer.R
 import com.example.superimagesviewer.databinding.InstagramPostFragmentBinding

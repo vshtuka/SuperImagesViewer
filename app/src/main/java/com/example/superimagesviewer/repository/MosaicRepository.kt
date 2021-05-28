@@ -18,16 +18,16 @@ import org.json.JSONObject
 
 class MosaicRepository(application: Application) {
 
-    val TAG = MosaicRepository::class.simpleName
+    private val TAG = MosaicRepository::class.simpleName
 
-    private val drawables = mutableListOf<Drawable>()
+    private val drawablesMap = hashMapOf<String, Drawable>()
     private val mosaicsList = MutableLiveData<List<Drawable>>()
-    internal fun getMosaicsList(): LiveData<List<Drawable>> {
+    fun getMosaicsList(): LiveData<List<Drawable>> {
         return mosaicsList
     }
 
-    private lateinit var instagramUserName: String
-    internal fun getUserName(): String {
+    private val instagramUserName = MutableLiveData<String>()
+    fun getUserName(): LiveData<String> {
         return instagramUserName
     }
 
@@ -43,21 +43,17 @@ class MosaicRepository(application: Application) {
 
     private fun loadInstagramUserName() {
         val token = AccessToken.getCurrentAccessToken()
-        val userNameRequest = GraphRequest(
+        GraphRequest(
             token,
             "/$INSTAGRAM_ID?fields=username",
             null,
             HttpMethod.GET
         ) { findUserNameResponse ->
             val userNameResponse: JSONObject = findUserNameResponse.jsonObject
-            instagramUserName = userNameResponse.getString("username")
-        }
-        val thread = Thread {
-            userNameRequest.executeAndWait()
-        }
-        thread.start()
-        thread.join()
+            instagramUserName.postValue(userNameResponse.getString("username"))
+        }.executeAsync()
     }
+
 
     private fun loadImagesFromInstagram(application: Application) {
         val token = AccessToken.getCurrentAccessToken()
@@ -82,7 +78,7 @@ class MosaicRepository(application: Application) {
             val imageId: String = data.getJSONObject(id).getString("id")
             val findImagesByIdsRequest = GraphRequest(
                 token,
-                "/$imageId?fields=media_url",
+                "/$imageId?fields=media_url,timestamp",
                 null,
                 HttpMethod.GET
             ) { findImageByUrlResponse ->
@@ -93,8 +89,9 @@ class MosaicRepository(application: Application) {
     }
 
     private fun loadImageByCoil(findImageByUrlResponse: GraphResponse, application: Application) {
-        val imageUrlResponse: JSONObject = findImageByUrlResponse.jsonObject
-        val imageUrl: String = imageUrlResponse.getString("media_url")
+        val imageResponse: JSONObject = findImageByUrlResponse.jsonObject
+        val imageUrl: String = imageResponse.getString("media_url")
+        val imageUploadData: String = imageResponse.getString("timestamp")
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO) {
                 val imageLoader = Coil.imageLoader(application)
@@ -103,8 +100,9 @@ class MosaicRepository(application: Application) {
                     .build()
                 val drawable = imageLoader.execute(coilRequest).drawable
                 if (drawable != null) {
-                    drawables.add(drawable)
-                    mosaicsList.postValue(drawables)
+                    drawablesMap[imageUploadData] = drawable
+                    val sortedMap = drawablesMap.toSortedMap(compareByDescending { it })
+                    mosaicsList.postValue(sortedMap.values.toList())
                 }
             }
         }
