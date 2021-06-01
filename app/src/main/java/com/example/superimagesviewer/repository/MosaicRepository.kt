@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import coil.Coil
 import coil.request.GetRequest
+import com.example.superimagesviewer.Settings
 import com.facebook.*
 import com.facebook.AccessToken
 import kotlinx.coroutines.*
@@ -20,7 +21,7 @@ class MosaicRepository(application: Application) {
 
     private val TAG = MosaicRepository::class.simpleName
 
-    private val drawablesMap = hashMapOf<String, Drawable>()
+    private val drawables = mutableListOf<InstagramImage>()
     private val mosaicsList = MutableLiveData<List<Drawable>>()
     fun getMosaicsList(): LiveData<List<Drawable>> {
         return mosaicsList
@@ -34,14 +35,20 @@ class MosaicRepository(application: Application) {
     init {
         if (isNetworkConnected(application)) {
             Log.d(TAG, "Successful internet connection")
-            loadInstagramUserName()
+            val userName = Settings.getUserName(application)
+            if (userName == null) {
+                loadInstagramUserName(application, userName)
+            } else {
+                instagramUserName.postValue(userName!!)
+                loadInstagramUserName(application, userName)
+            }
             loadImagesFromInstagram(application)
         } else {
             Log.d(TAG, "No internet connection or network problems")
         }
     }
 
-    private fun loadInstagramUserName() {
+    private fun loadInstagramUserName(application: Application, userName: String?) {
         val token = AccessToken.getCurrentAccessToken()
         GraphRequest(
             token,
@@ -50,7 +57,10 @@ class MosaicRepository(application: Application) {
             HttpMethod.GET
         ) { findUserNameResponse ->
             val userNameResponse: JSONObject = findUserNameResponse.jsonObject
-            instagramUserName.postValue(userNameResponse.getString("username"))
+            if (userName != userNameResponse.getString("username")) {
+                instagramUserName.postValue(userNameResponse.getString("username"))
+                Settings.setUserName(application, userNameResponse.getString("username"))
+            }
         }.executeAsync()
     }
 
@@ -100,9 +110,9 @@ class MosaicRepository(application: Application) {
                     .build()
                 val drawable = imageLoader.execute(coilRequest).drawable
                 if (drawable != null) {
-                    drawablesMap[imageUploadData] = drawable
-                    val sortedMap = drawablesMap.toSortedMap(compareByDescending { it })
-                    mosaicsList.postValue(sortedMap.values.toList())
+                    drawables.add(InstagramImage(drawable, imageUploadData))
+                    drawables.sortByDescending { it.uploadDataTime }
+                    mosaicsList.postValue(drawables.map { it.image })
                 }
             }
         }
@@ -136,6 +146,11 @@ class MosaicRepository(application: Application) {
         return networkCapabilities != null &&
                 networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
+
+    data class InstagramImage(
+        val image: Drawable,
+        val uploadDataTime: String
+    )
 
     companion object {
         lateinit var findImagesByIdsAsyncTask: GraphRequestAsyncTask
