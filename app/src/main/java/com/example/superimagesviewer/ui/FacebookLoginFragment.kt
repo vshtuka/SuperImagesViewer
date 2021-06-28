@@ -30,19 +30,21 @@ class FacebookLoginFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        LoginManager.getInstance().logInWithReadPermissions(
-            this, listOf(
-                "public_profile",
-                "email",
-                "instagram_basic",
-                "pages_show_list",
-                "instagram_manage_comments",
-                "instagram_manage_insights",
-                "instagram_content_publish",
-                "pages_read_engagement",
-                "business_management"
+        binding.loginButton.setOnClickListener {
+            LoginManager.getInstance().logInWithReadPermissions(
+                this, listOf(
+                    "public_profile",
+                    "email",
+                    "instagram_basic",
+                    "pages_show_list",
+                    "instagram_manage_comments",
+                    "instagram_manage_insights",
+                    "instagram_content_publish",
+                    "pages_read_engagement",
+                    "business_management"
+                )
             )
-        )
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

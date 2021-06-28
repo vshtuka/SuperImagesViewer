@@ -47,11 +47,6 @@ class MosaicFragment : Fragment() {
         mosaicViewModel.userName.observe(viewLifecycleOwner, userNameObserver)
     }
 
-    override fun onStop() {
-        super.onStop()
-        MosaicRepository.findImagesByIdsAsyncTask.cancel(true)
-    }
-
     private fun initRecyclerView() {
         val layoutManager = GridLayoutManager(
             context, GRID_SPAN_COUNT,
@@ -69,7 +64,7 @@ class MosaicFragment : Fragment() {
             adapter.setDrawables(mosaicList)
             binding.recyclerView.adapter = adapter
         }
-        mosaicViewModel.mosaicsList.observe(viewLifecycleOwner, mosaicObserver)
+        mosaicViewModel.drawablesList.observe(viewLifecycleOwner, mosaicObserver)
     }
 
     private fun calculateGridCount(position: Int): Int {
