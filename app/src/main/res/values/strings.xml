@@ -6,6 +6,7 @@
     <string name="upload">Upload</string>
     <string name="please_enter_photo_url">Please enter photo URL</string>
     <string name="instagram_photos">Instagram photos</string>
-    <string name="upload_image">Upload image</string>
+    <string name="upload_image_to_instagram">Upload image to Instagram</string>
     <string name="login_logout">Login/logout</string>
+    <string name="OK">OK</string>
 </resources>

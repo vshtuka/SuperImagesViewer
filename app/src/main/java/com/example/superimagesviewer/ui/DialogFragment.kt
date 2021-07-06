@@ -5,13 +5,14 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import com.example.superimagesviewer.R
 
-class ImageUploadDialogFragment(private val message: String) : DialogFragment() {
+class DialogFragment(private val message: String) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
             builder.setMessage(message)
-                .setPositiveButton("OK") { dialog, id ->
+                .setPositiveButton(R.string.OK) { dialog, id ->
                     dialog.cancel()
                 }
             builder.create()

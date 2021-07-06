@@ -1,5 +1,6 @@
 package com.example.superimagesviewer.ui
 
+import android.app.Application
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -60,11 +61,21 @@ class MosaicFragment : Fragment() {
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = layoutManager
         adapter = RecyclerAdapter()
-        val mosaicObserver = Observer { mosaicList: List<Drawable> ->
-            adapter.setDrawables(mosaicList)
-            binding.recyclerView.adapter = adapter
-        }
-        mosaicViewModel.drawablesList.observe(viewLifecycleOwner, mosaicObserver)
+        mosaicViewModel.drawablesList.observe(
+            viewLifecycleOwner,
+            { drawablesList: List<Drawable> ->
+                adapter.setDrawables(drawablesList)
+                binding.recyclerView.adapter = adapter
+            })
+        mosaicViewModel.isProgressVisible.observe(
+            viewLifecycleOwner,
+            { isProgressVisible: Boolean ->
+                if (isProgressVisible) {
+                    binding.mosaicProgressBar.visibility = View.VISIBLE
+                } else {
+                    binding.mosaicProgressBar.visibility = View.INVISIBLE
+                }
+            })
     }
 
     private fun calculateGridCount(position: Int): Int {

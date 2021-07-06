@@ -34,7 +34,13 @@ class MosaicRepository {
         return instagramUserName
     }
 
-    public fun loadInstagramUserName(application: Application, userName: String?) {
+    private val isProgressVisible = MutableLiveData<Boolean>()
+    public fun getProgressVisibility(): LiveData<Boolean> {
+        return isProgressVisible
+    }
+
+    public fun loadInstagramUserName(): String {
+        var newUserName = ""
         val token = AccessToken.getCurrentAccessToken()
         GraphRequest(
             token,
@@ -43,15 +49,13 @@ class MosaicRepository {
             HttpMethod.GET
         ) { findUserNameResponse ->
             val userNameResponse: JSONObject = findUserNameResponse.jsonObject
-            val newUserName = userNameResponse.getString("username")
-            if (userName != newUserName) {
-                instagramUserName.postValue(newUserName)
-                Settings.setUserName(application, newUserName)
-            }
-        }.executeAsync()
+            newUserName = userNameResponse.getString("username")
+        }.executeAndWait()
+        return newUserName
     }
 
     public fun loadImagesFromInstagram(application: Application) {
+        isProgressVisible.postValue(true)
         val token = AccessToken.getCurrentAccessToken()
         GraphRequest(
             token,
@@ -61,6 +65,7 @@ class MosaicRepository {
         ) { findMediasResponse ->
             findImagesByIds(findMediasResponse, application, token)
         }.executeAndWait()
+        isProgressVisible.postValue(false)
     }
 
     private fun findImagesByIds(

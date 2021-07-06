@@ -30,27 +30,27 @@ class InstagramPostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.uploadButton.setOnClickListener {
             val photoUrl = binding.editTextPhotoUrl.text.toString()
-            if (URLUtil.isValidUrl(photoUrl)) {
-                binding.editTextPhotoUrl.isEnabled = false
-                binding.uploadButton.isClickable = false
-                CoroutineScope(Dispatchers.Main).launch {
-                    binding.imageUploadProgressBar.visibility = View.VISIBLE
-                    withContext(Dispatchers.IO) {
-                        instagramPostViewModel.uploadImageToInstagram(photoUrl)
-                    }
-                    binding.editTextPhotoUrl.isEnabled = true
-                    binding.uploadButton.isClickable = true
-                    binding.imageUploadProgressBar.visibility = View.INVISIBLE
-                    showDialog("Upload successful")
-                }
-            } else {
+            if (!URLUtil.isValidUrl(photoUrl)) {
                 showDialog("Invalid or empty url")
+                return@setOnClickListener
+            }
+            binding.editTextPhotoUrl.isEnabled = false
+            binding.uploadButton.isClickable = false
+            CoroutineScope(Dispatchers.Main).launch {
+                binding.imageUploadProgressBar.visibility = View.VISIBLE
+                withContext(Dispatchers.IO) {
+                    instagramPostViewModel.uploadImageToInstagram(photoUrl)
+                }
+                binding.editTextPhotoUrl.isEnabled = true
+                binding.uploadButton.isClickable = true
+                binding.imageUploadProgressBar.visibility = View.INVISIBLE
+                showDialog("Upload successful")
             }
         }
     }
 
     private fun showDialog(message: String) {
-        val myDialogFragment = ImageUploadDialogFragment(message)
+        val myDialogFragment = DialogFragment(message)
         val manager = parentFragmentManager
         myDialogFragment.show(manager, DIALOG_TAG)
     }
