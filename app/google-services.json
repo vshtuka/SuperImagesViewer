@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "780197164533",
+    "project_id": "super-images-viewer",
+    "storage_bucket": "super-images-viewer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:780197164533:android:a2bc30b568dcb0cd411cbc",
+        "android_client_info": {
+          "package_name": "com.example.superimagesviewer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "780197164533-usprcja3lj28e8utnv65r1qdm9hu7bc5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK9FJiitIgZn9T0TGgOO4Hc8eW9uy6jGU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "780197164533-usprcja3lj28e8utnv65r1qdm9hu7bc5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

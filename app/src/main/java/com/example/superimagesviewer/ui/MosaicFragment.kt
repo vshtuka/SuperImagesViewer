@@ -1,57 +1,51 @@
 package com.example.superimagesviewer.ui
 
+import android.app.Application
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
-import androidx.recyclerview.widget.RecyclerView
-import com.example.superimagesviewer.repository.MosaicRepository
-import com.example.superimagesviewer.viewmodel.MosaicViewModel
 import com.example.superimagesviewer.R
 import com.example.superimagesviewer.RecyclerAdapter
+import com.example.superimagesviewer.databinding.MosaicFragmentBinding
+import com.example.superimagesviewer.repository.MosaicRepository
+import com.example.superimagesviewer.viewmodel.MosaicViewModel
+
 
 class MosaicFragment : Fragment() {
 
-    lateinit var postPageButton: Button
-    lateinit var recyclerView: RecyclerView
-    lateinit var adapter: RecyclerAdapter
-    lateinit var mosaicViewModel: MosaicViewModel
+    private lateinit var binding: MosaicFragmentBinding
+    private lateinit var adapter: RecyclerAdapter
+    private lateinit var mosaicViewModel: MosaicViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.mosaic_fragment, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        recyclerView = view.findViewById(R.id.recycler_view)
-        postPageButton = view.findViewById(R.id.mosaic_to_post_page_button)
-        postPageButton.setOnClickListener{
-            view.findNavController().navigate(
-                MosaicFragmentDirections.actionMosaicFragmentToInstagramPostFragment()
-            )
-        }
+    ): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.mosaic_fragment, container, false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         mosaicViewModel = ViewModelProvider(this).get(MosaicViewModel::class.java)
+        setFragmentTitle()
         initRecyclerView()
     }
 
-    override fun onStop() {
-        super.onStop()
-        MosaicRepository.findImagesByIdsAsyncTask.cancel(true)
+    private fun setFragmentTitle() {
+        val userNameObserver = Observer { instagramUserName: String ->
+            (requireActivity() as AppCompatActivity).supportActionBar?.title = instagramUserName
+        }
+        mosaicViewModel.userName.observe(viewLifecycleOwner, userNameObserver)
     }
 
     private fun initRecyclerView() {
@@ -64,14 +58,24 @@ class MosaicFragment : Fragment() {
                 return calculateGridCount(position)
             }
         }
-        recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = layoutManager
+        binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.layoutManager = layoutManager
         adapter = RecyclerAdapter()
-        val mosaicObserver = Observer { mosaicList: List<Drawable> ->
-            adapter.setDrawables(mosaicList)
-            recyclerView.adapter = adapter
-        }
-        mosaicViewModel.mosaicsList.observe(viewLifecycleOwner, mosaicObserver)
+        mosaicViewModel.drawablesList.observe(
+            viewLifecycleOwner,
+            { drawablesList: List<Drawable> ->
+                adapter.setDrawables(drawablesList)
+                binding.recyclerView.adapter = adapter
+            })
+        mosaicViewModel.isProgressVisible.observe(
+            viewLifecycleOwner,
+            { isProgressVisible: Boolean ->
+                if (isProgressVisible) {
+                    binding.mosaicProgressBar.visibility = View.VISIBLE
+                } else {
+                    binding.mosaicProgressBar.visibility = View.INVISIBLE
+                }
+            })
     }
 
     private fun calculateGridCount(position: Int): Int {
