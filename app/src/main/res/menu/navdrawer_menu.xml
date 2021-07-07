@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/facebook_login_fragment"
+        android:title="@string/login_logout" />
+    <item
+        android:id="@+id/mosaic_fragment"
+        android:title="@string/instagram_photos" />
+    <item
+        android:id="@+id/instagram_post_fragment"
+        android:title="@string/upload_image_to_instagram" />
+
+    <item
+        android:id="@+id/firebase_image_upload_fragment"
+        android:title="@string/upload_image_to_firebase" />
+</menu>
