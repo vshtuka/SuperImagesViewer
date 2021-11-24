@@ -2,11 +2,18 @@
     <string name="app_name">SuperImagesViewer</string>
     <string name="facebook_app_id">140609281215175</string>
     <string name="fb_login_protocol_scheme">fb140609281215175</string>
+    <string name="facebook_login">Auth</string>
+    <string name="mosaic_view">Photos</string>
     <string name="post_instagram">Post</string>
+    <string name="mosaic_page"><![CDATA[Mosaic page ->]]></string>
+    <string name="post_page"><![CDATA[Post page ->]]></string>
     <string name="upload">Upload</string>
     <string name="please_enter_photo_url">Please enter photo URL</string>
+    <string name="post_to_mosaic_page"><![CDATA[<- Mosaic page]]></string>
+    <string name="log_in_with_facebook">Log in with Facebook</string>
     <string name="instagram_photos">Instagram photos</string>
     <string name="upload_image_to_instagram">Upload image to Instagram</string>
     <string name="login_logout">Login/logout</string>
+    <string name="upload_image_to_firebase">Upload image to Firebase</string>
     <string name="OK">OK</string>
 </resources>

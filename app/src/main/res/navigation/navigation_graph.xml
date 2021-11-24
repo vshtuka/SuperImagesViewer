@@ -31,4 +31,13 @@
             app:destination="@id/instagram_post_fragment" />
     </fragment>
     </fragment>
+    <fragment
+        android:id="@+id/firebase_image_upload_fragment"
+        android:name="com.example.superimagesviewer.ui.FirebaseImageUploadFragment"
+        android:label="Upload image to Firebase"
+        tools:layout="@layout/firebase_image_upload_fragment" >
+        <action
+            android:id="@+id/action_firebase_image_upload_fragment_self"
+            app:destination="@id/firebase_image_upload_fragment" />
+    </fragment>
 </navigation>
