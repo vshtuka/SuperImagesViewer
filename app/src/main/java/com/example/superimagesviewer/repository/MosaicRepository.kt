@@ -5,37 +5,57 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import coil.Coil
 import coil.request.GetRequest
+import com.example.superimagesviewer.Settings
+import com.example.superimagesviewer.model.InstagramImage
 import com.facebook.*
 import com.facebook.AccessToken
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
 
-class MosaicRepository(application: Application) {
+class MosaicRepository {
 
-    val TAG = MosaicRepository::class.simpleName
-
-    private val drawables = mutableListOf<Drawable>()
-    private val mosaicsList = MutableLiveData<List<Drawable>>()
-    fun getMosaicsList(): LiveData<List<Drawable>> {
-        return mosaicsList
+    private val instagramImageList = mutableListOf<InstagramImage>()
+    public fun getInstagramImageList(): MutableList<InstagramImage> {
+        return instagramImageList
     }
 
-    init {
-        if (isNetworkConnected(application)) {
-            Log.d(TAG, "Successful internet connection")
-            loadImagesFromInstagram(application)
-        } else {
-            Log.d(TAG, "No internet connection or network problems")
-        }
+    public val drawablesList = MutableLiveData<List<Drawable>>()
+    public fun getDrawablesList(): LiveData<List<Drawable>> {
+        return drawablesList
     }
 
-    private fun loadImagesFromInstagram(application: Application) {
+    public val instagramUserName = MutableLiveData<String>()
+    public fun getUserName(): LiveData<String> {
+        return instagramUserName
+    }
+
+    private val isProgressVisible = MutableLiveData<Boolean>()
+    public fun getProgressVisibility(): LiveData<Boolean> {
+        return isProgressVisible
+    }
+
+    public fun loadInstagramUserName(): String {
+        var newUserName = ""
+        val token = AccessToken.getCurrentAccessToken()
+        GraphRequest(
+            token,
+            "/$INSTAGRAM_ID?fields=username",
+            null,
+            HttpMethod.GET
+        ) { findUserNameResponse ->
+            val userNameResponse: JSONObject = findUserNameResponse.jsonObject
+            newUserName = userNameResponse.getString("username")
+        }.executeAndWait()
+        return newUserName
+    }
+
+    public fun loadImagesFromInstagram(application: Application) {
+        isProgressVisible.postValue(true)
         val token = AccessToken.getCurrentAccessToken()
         GraphRequest(
             token,
@@ -44,7 +64,8 @@ class MosaicRepository(application: Application) {
             HttpMethod.GET
         ) { findMediasResponse ->
             findImagesByIds(findMediasResponse, application, token)
-        }.executeAsync()
+        }.executeAndWait()
+        isProgressVisible.postValue(false)
     }
 
     private fun findImagesByIds(
@@ -56,22 +77,22 @@ class MosaicRepository(application: Application) {
         val data: JSONArray = findDataResponse.getJSONArray("data")
         for (id in 0 until data.length()) {
             val imageId: String = data.getJSONObject(id).getString("id")
-            val findImagesByIdsRequest = GraphRequest(
+            GraphRequest(
                 token,
-                "/$imageId?fields=media_url",
+                "/$imageId?fields=media_url,timestamp",
                 null,
                 HttpMethod.GET
             ) { findImageByUrlResponse ->
                 loadImageByCoil(findImageByUrlResponse, application)
-            }
-            findImagesByIdsAsyncTask = findImagesByIdsRequest.executeAsync()
+            }.executeAndWait()
         }
     }
 
     private fun loadImageByCoil(findImageByUrlResponse: GraphResponse, application: Application) {
-        val imageUrlResponse: JSONObject = findImageByUrlResponse.jsonObject
-        val imageUrl: String = imageUrlResponse.getString("media_url")
-        CoroutineScope(Dispatchers.Main).launch {
+        val imageResponse: JSONObject = findImageByUrlResponse.jsonObject
+        val imageUrl: String = imageResponse.getString("media_url")
+        val timestamp: String = imageResponse.getString("timestamp")
+        CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.IO) {
                 val imageLoader = Coil.imageLoader(application)
                 val coilRequest = GetRequest.Builder(application)
@@ -79,15 +100,13 @@ class MosaicRepository(application: Application) {
                     .build()
                 val drawable = imageLoader.execute(coilRequest).drawable
                 if (drawable != null) {
-                    drawables.add(drawable)
-                    mosaicsList.postValue(drawables)
+                    instagramImageList.add(InstagramImage(drawable, timestamp))
                 }
             }
         }
-
     }
 
-    fun uploadPhotoToInstagramByUrl(photoUrl: String) {
+    public fun uploadPhotoToInstagramByUrl(photoUrl: String) {
         val token = AccessToken.getCurrentAccessToken()
         GraphRequest(
             token,
@@ -102,11 +121,11 @@ class MosaicRepository(application: Application) {
                 "$INSTAGRAM_ID/media_publish?creation_id=$containerId",
                 null,
                 HttpMethod.POST
-            ).executeAsync()
-        }.executeAsync()
+            ).executeAndWait()
+        }.executeAndWait()
     }
 
-    private fun isNetworkConnected(application: Application): Boolean {
+    public fun isNetworkConnected(application: Application): Boolean {
         val connectivityManager =
             application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork
@@ -116,7 +135,6 @@ class MosaicRepository(application: Application) {
     }
 
     companion object {
-        lateinit var findImagesByIdsAsyncTask: GraphRequestAsyncTask
         private const val INSTAGRAM_ID = 17841445611980036
     }
 

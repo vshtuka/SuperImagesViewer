@@ -3,32 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/facebookLoginFragment">
+    app:startDestination="@id/facebook_login_fragment">
     <fragment
-        android:id="@+id/facebookLoginFragment"
+        android:id="@+id/facebook_login_fragment"
         android:name="com.example.superimagesviewer.ui.FacebookLoginFragment"
-        android:label="facebook_login_fragment"
+        android:label="Login page"
         tools:layout="@layout/facebook_login_fragment" >
         <action
-            android:id="@+id/action_facebookLoginFragment_to_mosaicFragment"
-            app:destination="@id/mosaicFragment" />
+            android:id="@+id/action_facebook_login_fragment_self"
+            app:destination="@id/facebook_login_fragment" />
     </fragment>
     <fragment
-        android:id="@+id/mosaicFragment"
+        android:id="@+id/mosaic_fragment"
         android:name="com.example.superimagesviewer.ui.MosaicFragment"
-        android:label="mosaic_fragment"
         tools:layout="@layout/mosaic_fragment">
         <action
-            android:id="@+id/action_mosaicFragment_to_instagramPostFragment"
-            app:destination="@id/instagramPostFragment" />
+            android:id="@+id/action_mosaic_fragment_self"
+            app:destination="@id/mosaic_fragment" />
     </fragment>
     <fragment
-        android:id="@+id/instagramPostFragment"
+        android:id="@+id/instagram_post_fragment"
         android:name="com.example.superimagesviewer.ui.InstagramPostFragment"
-        android:label="instagram_post_fragment_"
-        tools:layout="@layout/instagram_post_fragment_" >
+        android:label="Upload image to Instagram"
+        tools:layout="@layout/instagram_post_fragment" >
         <action
-            android:id="@+id/action_instagramPostFragment_to_mosaicFragment"
-            app:destination="@id/mosaicFragment" />
+            android:id="@+id/action_instagram_post_fragment_self"
+            app:destination="@id/instagram_post_fragment" />
+    </fragment>
     </fragment>
 </navigation>
